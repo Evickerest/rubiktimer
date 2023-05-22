@@ -8,6 +8,11 @@ const scrambleText = document.querySelector(".scramble");
 const timerWrapper = document.querySelector(".times-wrapper");
 const timesTable = document.querySelector(".times-table")
 
+const checkBox ="<input class='check' type='checkbox' data-value='2' onclick='plusTwo(this)'>+2</input>";
+
+const deleteSolve = "<button onclick='deleteRow(this)'>X</button>";
+
+
 const scrambleDict = {
     "L": ["L","L'","L2"],
     "R": ["R","R'","R2"],
@@ -63,11 +68,27 @@ function addTime(){
     const row = timesTable.insertRow(1);
     row.insertCell(0).textContent = solveNumber++;
     row.insertCell(1).textContent = milliseconds / 1000;
-    row.insertCell(2).innerHTML = "<button>+2</button>";
-    row.insertCell(3).innerHTMl = "<button>X</button";
+    row.insertCell(2).innerHTML = checkBox;
+    row.insertCell(3).innerHTML = deleteSolve;
+    milliseconds = 0;
+}
 
+function deleteRow(ele){
+    const rowNum = ele.closest("tr").rowIndex;
+    timesTable.deleteRow(rowNum);
+    resetRowNumbers(rowNum);
+}
 
+function resetRowNumbers(rowNum){
+    for(i = 1; i < rowNum; i++){
+        timesTable.rows[i].cells[0].textContent--;
+    }
+}
 
+function plusTwo(ele){
+    let time = ele.closest("tr").cells[1].textContent;
+    ele.closest("tr").cells[1].textContent = (parseFloat(time) + parseInt(ele.dataset.value)).toFixed(3) * 1;
+    ele.dataset.value *= -1;
 }
 
 //converts all times into 000:00.000 
