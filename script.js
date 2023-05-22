@@ -1,11 +1,12 @@
 let starting = true;
 let ending = false;
 let milliseconds = 0;
+let solveNumber = 1;
 let scramble = "";
 const timer = document.querySelector(".timer");
 const scrambleText = document.querySelector(".scramble");
 const timerWrapper = document.querySelector(".times-wrapper");
-
+const timesTable = document.querySelector(".times-table")
 
 const scrambleDict = {
     "L": ["L","L'","L2"],
@@ -59,12 +60,14 @@ function getOffset(){
 
 function addTime(){
     const fragment = new DocumentFragment();
-    const time = document.createElement("div");
-    time.textContent = milliseconds / 1000;
-    time.title = scramble;
-    fragment.appendChild(time);
-    timerWrapper.appendChild(fragment);
-    milliseconds = 0;
+    const row = timesTable.insertRow(1);
+    row.insertCell(0).textContent = solveNumber++;
+    row.insertCell(1).textContent = milliseconds / 1000;
+    row.insertCell(2).innerHTML = "<button>+2</button>";
+    row.insertCell(3).innerHTMl = "<button>X</button";
+
+
+
 }
 
 //converts all times into 000:00.000 
