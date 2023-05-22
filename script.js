@@ -1,7 +1,10 @@
-let isTimerGoing = false;
+let starting = true;
+let ending = false;
 let milliseconds = 0;
+let scramble = "";
 const timer = document.querySelector(".timer");
-const scramble = document.querySelector(".scramble");
+const scrambleText = document.querySelector(".scramble");
+const timerWrapper = document.querySelector(".times-wrapper");
 
 
 const scrambleDict = {
@@ -17,25 +20,35 @@ const scrambleList = ["F","F'","F2","B","B'","B2","U","U'","U2","D","D'","D2","R
 
 const button = document.querySelector(".timer-button");
 
-document.body.onkeyup = function(e) {
-    if(e.key == 32 || e.code == "Space"){
-        !isTimerGoing ? startTimer() : stopTimer();
-        isTimerGoing = !isTimerGoing;
+
+// when pressing down stop, and the second time up start again
+document.body.onkeyup = function(e){
+    if(e.code == "Space" ){
+        if(starting ){ 
+            startTimer();
+            starting = false;
+        } else {
+            starting = true;
+        }
     }
 }
 
+document.body.onkeydown = function(e){ 
+    if(e.code == "Space" && !e.repeat && !starting) stopTimer(); 
+}
+    
 function startTimer(){
     timerClock = setInterval( changeTimer, 1);
     offset = Date.now();
 }
 function changeTimer(){
     milliseconds += getOffset();
-    timer.innerHTML = new Date(milliseconds).toISOString().slice(11,-1);
+    timer.innerHTML = getTimeString();
 }
 function stopTimer(){
     clearInterval(timerClock);
-    milliseconds = 0;
-    newScramble();                
+    addTime();
+    generateScramble();                
 }
 function getOffset(){
     now = Date.now();
@@ -44,23 +57,40 @@ function getOffset(){
     return delta;
 }
 
-function generateScramble(length){
+function addTime(){
+    const fragment = new DocumentFragment();
+    const time = document.createElement("div");
+    time.textContent = milliseconds / 1000;
+    time.title = scramble;
+    fragment.appendChild(time);
+    timerWrapper.appendChild(fragment);
+    milliseconds = 0;
+}
+
+//converts all times into 000:00.000 
+//but if no minutes, then 0.000
+function getTimeString(){
+    mins = Math.floor(milliseconds / 60000);
+    secs = Math.floor(milliseconds / 1000) % 60;
+    mils = milliseconds % 1000
+    return ((mins != 0) ? mins + ":" + ("0" + secs).slice(-2) : secs) + "." + mils;
+}
+
+function generateScramble(){
     let previous = "";
     let letter = "";
-    let tempScramble = [];
-    for(i = 0; i < length; i++){
+    let tempScramble = "";
+    for(i = 0; i < 20; i++){
         while(previous == letter || (scrambleDict[letter[0]]).includes(previous)){
             ranNum = Math.floor(Math.random() * scrambleList.length);
             letter = scrambleList[ranNum];
         }
-        tempScramble.push(letter);
+        tempScramble += (letter) + "  ";
         previous = letter;
     }
-    return tempScramble;
+    scramble = tempScramble;
+    scrambleText.textContent = scramble;
 }
 
-function newScramble(){
-    scramble.innerHTML = generateScramble(20);
-}
+generateScramble();
 
-newScramble();
